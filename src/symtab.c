@@ -187,7 +187,10 @@ void dump_reloc(reloc* r)
 	    fprintf(stdout, "()");
     }
 
-    if ( true  )  {
+    // Not interested in seeing zero addend; but if it's 
+    // all there is, print it anyway
+    const bool show_addend = (r->addend != 0) || !r->sym_name;
+    if ( show_addend )  {
 	fprintf(stdout, "%ld", r->addend);
     }
 

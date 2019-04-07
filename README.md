@@ -1,10 +1,13 @@
 # elfref
-A tool to find what ELF symbols reference by interpreting relocation records.
+A tool to dump references in an ELF file.
 
 This information is useful when debugging a linking issue (usually over email)
-and you need to trace the unsatisfied reference back to the source code. The
+and you need to trace the unsatisfied reference back to source code. The
 name of the referrer is not given by all linkers, nor all the customers would
-report you that.
+report you that. 
+
+`elfref` finds this information by mapping relocation records back to the symbols
+(functions or data) they are supposed to modify.
 
 ## Example
 This is how the `elfref` output will look like for a function call in
@@ -16,7 +19,7 @@ main (addr 0x00000000)
 	(+0x001c)-> process_args()-4
 ```
 In a nutshell, this means that the function `main()` refers to 
-the function process_args().
+the function `process_args()`.
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your
