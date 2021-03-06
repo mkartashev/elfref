@@ -26,14 +26,17 @@
 */
 
 #include "perf.h"
-#include "globals.h"
 #include "errors.h"
+#include "args.h"
 
 #include <malloc.h>
 
-void print_memstats()
+/**
+ * Prints out memory usage statistics. Must be called prior to releasing memory allocated on the heap.
+ */
+extern void	perf_print_memstats()
 {
-    if ( globals.opts.verbosity < DBG ) 
+    if ( args_get_verbosity() < DBG ) 
 	return;
 
     struct mallinfo mi = mallinfo();

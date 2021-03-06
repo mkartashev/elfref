@@ -1,8 +1,8 @@
 # elfref
 A tool to dump references in an ELF file.
 
-This information is useful when debugging a linking issue (usually over email)
-and you need to trace the unsatisfied reference back to source code. The
+This information is useful when debugging a linking issue (usually over an email)
+and you need to trace the unsatisfied reference back to the source code. The
 name of the referrer is not given by all linkers, nor all the customers would
 report you that. 
 
@@ -11,15 +11,15 @@ report you that.
 
 ## Example
 This is how the `elfref` output will look like for a function call in
-a C program
+a C program:
 ```
 $ elfref a.o 
 elfref: Input (a.o) is a 64-bit little endian ELF relocatable file.
 main (addr 0x00000000)
 	(+0x001c)-> process_args()-4
 ```
-In a nutshell, this means that the function `main()` refers to 
-the function `process_args()`.
+In a nutshell, this means that the function `main()` refers to the function
+`process_args()`.
 
 ## Getting Started
 These instructions will get you a copy of the project up and running on your
@@ -27,12 +27,12 @@ local machine for development and testing purposes.
 
 ### Prerequisites
 The build was only tested on Linux (Ubuntu and Red Hat) with gcc 6.+.
-Earlier versions of gcc will work, but require minor modification
+Earlier versions of gcc will work, but require a minor modification
 to `./Makefile` to remove more recent warning options.
 
 ### Building
 ```
-$ git clone ... elfref
+$ git clone https://github.com/mkartashev/elfref.git
 $ cd elfref/
 $ make
 ```

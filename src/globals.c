@@ -33,21 +33,37 @@
 #include <string.h>
 #include <limits.h>
 
-void init_globals(int argc __attribute__((unused)), char* argv[])
+static char *	prg_name;	// the name of self for error reporting
+
+/**
+ * Releses the global resources allocated by glob_init(). Should be called right before exit.
+ */
+static void		glob_fini(void)
 {
-    globals = (struct globals){0};
+	// Note: can't call fatal() from here or we will recurse
 
-    char *self_full = strndupa(argv[0], PATH_MAX);
-    char *self = basename(self_full);
-    globals.prg_name = strdup(self); // remember our basename for messages
-
-    globals.opts.verbosity = NORM;
+	if (prg_name)
+	{
+		free(prg_name);
+	}
 }
 
-void fini_globals()
+/**
+ * Initializes global state of the program. Must be called at the very start of main().
+ */
+extern void 		glob_init(int argc __attribute__((unused)), char *argv[])
 {
-    // Note: can't call fatal() from here or we will recurse
+	char *self_full = strndupa(argv[0], PATH_MAX);
+	char *self = basename(self_full);
+	prg_name = strdup(self); // remember our basename for messages
 
-    free(globals.prg_name);
+	atexit(glob_fini);
 }
 
+/**
+ * Returns the name of this program for the purpose of prefixing messages.
+ */
+extern const char *	glob_get_program_name(void)
+{
+	return prg_name;
+}

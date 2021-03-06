@@ -1,0 +1,2 @@
+elfref: Input (filename) is a 64-bit little endian ELF relocatable file.
+elfref: No symbols that match pattern found in .symtab and .dynsym; nothing to do.

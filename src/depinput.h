@@ -1,3 +1,4 @@
+
 /*
   This is free and unencumbered software released into the public domain.
 
@@ -25,24 +26,19 @@
   For more information, please refer to <http://unlicense.org/>
 */
 
-#ifndef SYMTAB_H_
-#define SYMTAB_H_
+#ifndef DEPINPUT_H_
+#define DEPINPUT_H_
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <sys/types.h>
+typedef struct input_s	input_t;
+typedef struct symtab_s	symtab_t;
 
-typedef struct symtab_s		symtab_t;
+// Bitness-dependent versions, implementations are in depintpu[32|64].c, which is produced by pre-processing depinput.inc
+void		find_sections_32(input_t* in);
+void		process_relocations_32(input_t* in, symtab_t*);
+symtab_t*	read_in_symtab_32(input_t* in);
 
-symtab_t *	symtab_alloc(size_t nsyms);
-void		symtab_free(symtab_t* s);
+void		find_sections_64(input_t* in);
+void		process_relocations_64(input_t* in, symtab_t*);
+symtab_t*	read_in_symtab_64(input_t* in);
 
-void		symtab_sort(symtab_t* s);
-void		symtab_dump(symtab_t* s);
-void		symtab_print_legend();
-
-size_t		symtab_add_sym(symtab_t* symtab, size_t offset, int type, const char* sym_name);
-void		symtab_add_reloc(symtab_t* symtab, size_t offset, const char* sym_name, bool is_func, int64_t addend);
-
-#endif
-
+#endif // DEPINPUT_H_

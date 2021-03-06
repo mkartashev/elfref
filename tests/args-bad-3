@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# Verify that -s without any argument prints out an error message and exits with non-zero.
+
+"$ELFREF" "$ELFREF" -s > out 2>&1
+[ $? -eq 0 ] && exit 1
+
+diff out "$ROOT/args-bad-3.ref" > diffs 2>/dev/null
+if [ $? -ne 0 ]; then
+	echo "-s help output differs from reference"
+	exit 1
+fi
+
+exit 0

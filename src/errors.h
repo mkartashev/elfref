@@ -27,12 +27,8 @@
 
 #ifndef ERRORS_H_
 #define ERRORS_H_
-#include <stdio.h>
 
 #define NORETURN __attribute__((noreturn))
-
-void fatal(const char* fmt, ...) NORETURN;
-void fatal_err(const char* msg) NORETURN; // also print errno description
 
 enum Verbosity {
     NORM,   // Normal
@@ -40,8 +36,10 @@ enum Verbosity {
     DBG	    // Debug
 };
 
-void report(enum Verbosity v, const char* fmt, ...);
-void error(const char* fmt, ...);
+void	fatal(const char* fmt, ...) NORETURN;
+void	fatal_err(const char* msg) NORETURN; // also print errno description
+void	report(enum Verbosity v, const char* fmt, ...);
+void	error(const char* fmt, ...);
 
 #endif
 

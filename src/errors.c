@@ -27,6 +27,7 @@
 
 #include "errors.h"
 #include "globals.h"
+#include "args.h"
 
 #include <stdlib.h>
 #include <errno.h>
@@ -36,52 +37,74 @@
 #include <string.h>
 #include <stdarg.h>
 
-void error(const char* fmt, ...)
+/**
+ * Issues the given error message to stderr using printf() formatting.
+ */
+extern void	error(const char *fmt, ...)
 {
-    va_list ap;
-
-    va_start(ap, fmt);
-    fprintf(stderr, "%s: Error: ", globals.prg_name);
-    vfprintf(stderr, fmt, ap);
-    fputc('\n', stderr);
-    va_end(ap);
-}
-
-void report(enum Verbosity v, const char* fmt, ...)
-{
-    if ( globals.opts.verbosity >= v ) {
 	va_list ap;
 
 	va_start(ap, fmt);
-	fprintf(stderr, "%s: ", globals.prg_name);
+	fprintf(stderr, "%s: Error: ", glob_get_program_name());
 	vfprintf(stderr, fmt, ap);
 	fputc('\n', stderr);
 	va_end(ap);
-    }
 }
 
-void fatal(const char* fmt, ...)
+/**
+ * Issues the given informational message to stderr using printf() formatting.
+ * The message is only issued if the verbosity level given is at least as high as requested by the user
+ * (see args_get_verbosity()).
+ */
+extern void	report(enum Verbosity v, const char *fmt, ...)
 {
-    va_list ap;
+	if (args_get_verbosity() >= v)
+	{
+		va_list ap;
 
-    va_start(ap, fmt);
-    fprintf(stderr, "%s: fatal error: ", globals.prg_name);
-    vfprintf(stderr, fmt, ap);
-    fputc('\n', stderr);
-    va_end(ap);
-
-    fini_globals();
-    exit(EXIT_FAILURE);
+		va_start(ap, fmt);
+		fprintf(stderr, "%s: ", glob_get_program_name());
+		vfprintf(stderr, fmt, ap);
+		fputc('\n', stderr);
+		va_end(ap);
+	}
 }
 
-void fatal_err(const char* msg)
+/**
+ * Issues a fatal error message to stderr using printf() formatting, performs cleanup and exists
+ * with the failure exit code.
+ */
+extern void	fatal(const char *fmt, ...)
 {
-    bool was_error = (errno > 0);
-    const char* errdescr = strerror(errno);
-    fprintf(stderr, "%s: fatal error: %s (%s)\n", globals.prg_name, msg, errdescr);
-    assert( was_error );
+	va_list ap;
 
-    fini_globals();
-    exit(EXIT_FAILURE);
+	va_start(ap, fmt);
+	fprintf(stderr, "%s: fatal error: ", glob_get_program_name());
+	vfprintf(stderr, fmt, ap);
+	fputc('\n', stderr);
+	va_end(ap);
+
+	exit(EXIT_FAILURE);
 }
 
+/**
+ * Issues a fatal error message to stderr coupled with errno description, performs cleanup and exists
+ * with the failure exit code.
+ */
+extern void	fatal_err(const char *msg)
+{
+	const bool was_error = (errno > 0);
+	const char *errdescr = strerror(errno);
+
+	// Not using fprintf() here because this function may be called what malloc() failed and fprintf() might try to allocate memory.
+	fputs(glob_get_program_name(), stderr);
+	fputs(": fatal error : ", stderr);
+	fputs(msg, stderr);
+	fputs(" (", stderr);
+	fputs(errdescr, stderr);
+	fputs(")\n", stderr);
+
+	assert(was_error);
+
+	exit(EXIT_FAILURE);
+}

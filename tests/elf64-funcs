@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Verify output on a pre-compiled 64-bit ELF object file (functions only)
+
+"$ELFREF" -f "$ROOT/elf64.o" > out 2>&1
+[ $? -ne 0 ] && exit 1
+
+# Normalize path names
+cat out | sed -E '1 s/\((.*)*\)/(filename)/' > out.filtered
+
+diff out.filtered "$ROOT/elf64-funcs.ref" > diffs 2>/dev/null
+if [ $? -ne 0 ]; then
+	echo "output differs from reference"
+	exit 1
+fi
+
+exit 0

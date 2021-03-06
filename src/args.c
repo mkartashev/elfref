@@ -35,8 +35,16 @@
 #include <unistd.h>
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
+#include <elf.h>
 
-static const char *usage_str = 
+static const char *	fname;			// name of input ELF file
+static unsigned int	verbosity;
+static const char *	name_pattern;		// if set, only report symbols matching this pattern
+static bool		funcs_only;		// only report about functions
+static bool		offsets_decimal;	// show offsets in the decimal form
+
+static const char *usage_str =
 "Usage: %s [OPTIONS]... ELF-FILE\n"
 "\tfind what symbols (funcs and global variables) reference in ELF-FILE\n"
 "\n"
@@ -50,14 +58,29 @@ static const char *usage_str =
 "    -vv\t\tverbose and debug output\n"
 ;
 
-void usage()
+/**
+ * Prints out program's usage info.
+ */
+extern void 	args_usage(void)
 {
-    printf(usage_str, globals.prg_name);
+    printf(usage_str, glob_get_program_name());
     printf("\nOutput format:\n");
-    print_legend();
+    symtab_print_legend();
 }
 
-bool parse_args(int argc, char* argv[], struct input* in)
+/**
+ * Initializes the program arguments to their default state.
+ * Must be called before any arguments are queried or parsed.
+ */
+extern void 	args_init(void)
+{
+	verbosity = NORM;
+}
+
+/**
+ * Processes the program options, issues appropriate diagnostics and returns true if arguments are OK.
+ */
+extern bool	args_parse(int argc, char* argv[], input_t* in)
 {
     assert( in );
 
@@ -65,33 +88,33 @@ bool parse_args(int argc, char* argv[], struct input* in)
 	const char* arg = argv[i];
 
 	if ( strcmp(arg, "-v") == 0 ) {
-	    globals.opts.verbosity = VERB;
+	    verbosity = VERB;
 	} else if ( strcmp(arg, "-vv") == 0 ) {
-	    globals.opts.verbosity = DBG;
+	    verbosity = DBG;
 	} else if ( strcmp(arg, "-f") == 0 ) {
-	    globals.opts.funcs_only = true;
+	    funcs_only = true;
 	} else if ( strcmp(arg, "-d") == 0 ) {
-	    globals.opts.offsets_decimal = true;
-	} else if ( strcmp(arg, "-h") == 0 ) {
+	    offsets_decimal = true;
+	} else if ( strcmp(arg, "--help") == 0 || strcmp(arg, "-?") == 0 || strcmp(arg, "-h") == 0 ) {
 	    return false;
 	} else if ( strcmp(arg, "-s") == 0 ) {
 	    i++;
 	    if ( i < argc ) {
-		globals.opts.name_pattern = argv[i];
+		name_pattern = argv[i];
 	    } else {
 		report(NORM, "-s option requires argument");
 		return false;
 	    }
 	} else {
-	    if ( ! globals.opts.fname ) {
-		globals.opts.fname = arg;
+	    if ( ! fname ) {
+		fname = arg;
 	    } else {
 		report(NORM, "Only one file name argument is supported (%s will be ignored)", arg);
 	    }
 	}
     }
 
-    if ( !globals.opts.fname ) {
+    if ( !fname ) {
 	report(NORM, "ELF file name required");
 	return false;
     }
@@ -99,3 +122,61 @@ bool parse_args(int argc, char* argv[], struct input* in)
     return true;
 }
 
+
+/**
+ * Returns the input ELF file name.
+ */
+extern const char * 	args_get_input_file_name(void)
+{
+	return fname;
+}
+
+
+/**
+ * Returns the verbosity level (-v -vv options).
+ */
+extern unsigned int 	args_get_verbosity(void)
+{
+	return verbosity;
+}
+
+/**
+ * Returns the naming pattern of the symbols the user is interested in (the -s option).
+ */
+extern const char * 	args_get_name_pattern(void)
+{
+	return name_pattern;
+}
+
+/**
+ * Returns true if only functions should be present in the output (the -f option).
+ */
+extern bool 		args_get_is_funcs_only(void)
+{
+	return funcs_only;
+}
+
+/**
+ * Returns true if offsets are requested to be printed in the decimal format (the -d option).
+ */
+extern bool 		args_get_is_offsets_decimal(void)
+{
+	return offsets_decimal;
+}
+
+/**
+ * Returns true if the symbol name and type satisfy filter specified by the user.
+ */
+extern bool		args_sym_is_interesting(const char *name, int type)
+{
+	if (type != STT_FUNC && type != STT_OBJECT)
+		return false;
+
+	if (args_get_is_funcs_only() && type != STT_FUNC)
+		return false;
+
+	if (args_get_name_pattern() && strstr(name, args_get_name_pattern()) == NULL)
+		return false;
+
+	return true;
+}

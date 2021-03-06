@@ -27,22 +27,23 @@
 
 #ifndef ARGS_H_
 #define ARGS_H_
+
 #include "input.h"
 
 #include <stdbool.h>
 
-struct options
-{
-    const char*	    fname; // name of input ELF file
-    unsigned int    verbosity;
-    const char*	    name_pattern; // if set, only report symbols matching this pattern
-    bool	    funcs_only; // only report about functions
-    bool	    terse; // only show symbols with references
-    bool	    offsets_decimal; // show offsets in the decimal form
-};
+void 		args_init(void);
 
-bool parse_args(int argc, char* argv[], struct input*);
-void usage();
+bool 		args_parse(int argc, char* argv[], input_t*);
+void 		args_usage();
+
+const char * 	args_get_input_file_name(void);
+unsigned int 	args_get_verbosity(void);
+const char * 	args_get_name_pattern(void);
+bool 		args_get_is_funcs_only(void);
+bool 		args_get_is_offsets_decimal(void);
+
+bool		args_sym_is_interesting(const char *name, int type);
 
 #endif
 

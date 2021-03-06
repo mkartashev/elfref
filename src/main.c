@@ -37,46 +37,47 @@
 #include <elf.h>
 #include <assert.h>
 
-void print_refs(struct input* in)
+static void	print_refs(input_t* in)
 {
-    assert( in );
-    assert( in->map != NULL && in->map != MAP_FAILED );
+	assert(in);
 
-    struct reader_funcs rdr = read_elf_header(in);
+	struct reader_funcs rdr = input_read_elf_header(in);
 
-    rdr.find_sections(in);
-    struct symtab* st = rdr.read_symtab(in);
-    if (st) {
-	rdr.process_relocations(in, st);
-	dump_symtab(st);
-	free_symtab(st);
-    }
+	rdr.find_sections(in);
 
-    // TODO: add timing infrastructure
-    // TODO: add option to filter by symbol name (strstr())
+	symtab_t *st = rdr.read_symtab(in);
+	if (st)
+	{
+		rdr.process_relocations(in, st);
+		symtab_dump(st);
+		symtab_free(st);
+	}
 }
 
-int main(int argc, char* argv[])
+extern int	main(int argc, char* argv[])
 {
-    init_globals(argc, argv);
+	int rc = EXIT_SUCCESS;
 
-    struct input in;
-    init_input(&in);
+	glob_init(argc, argv);
+	args_init();
 
-    if ( ! parse_args(argc, argv, &in) ) {
-	usage();
-	return EXIT_FAILURE;
-    }
+	input_t * in = input_init();
 
-    open_input(&in);
+	if (args_parse(argc, argv, in))
+	{
+		input_open(in);
 
-    print_refs(&in);
+		print_refs(in);
 
-    print_memstats(); // do it here before we have free'ed everything
+		perf_print_memstats(); // do it here before we have free'ed everything
 
-    fini_input(&in);
-    fini_globals();
+		input_close(in);
+	}
+	else
+	{
+		args_usage();
+		rc = EXIT_FAILURE;
+	}
 
-    return EXIT_SUCCESS;
+	return rc;
 }
-

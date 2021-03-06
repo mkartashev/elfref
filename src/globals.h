@@ -27,18 +27,11 @@
 
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
-#include "args.h"
 
-#include <stdbool.h>
+void 		glob_init(int argc, char* argv[]);
 
-struct globals
-{
-    char* prg_name; // name of self
-    struct options opts;
-} globals;
+const char *	glob_get_program_name(void);
 
-void init_globals(int argc, char* argv[]);
-void fini_globals();
 
 #endif
 

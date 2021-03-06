@@ -1,0 +1,19 @@
+elfref: -s option requires argument
+Usage: elfref [OPTIONS]... ELF-FILE
+	find what symbols (funcs and global variables) reference in ELF-FILE
+
+Options:
+    -s pattern	only show info about symbols of which pattern is a substring
+    -f		only show info about functions (symbol type FUNC);
+    		by default, OBJECTs are also shown
+    -d		print offsets in decimal instead of hex
+    -h		display help
+    -v		verbose output
+    -vv		verbose and debug output
+
+Output format:
+sym-name (addr sym-value)    <-- symbol name and address
+ (+offset-from-sym) -> [sym-name[()]] [+addend]
+ ^                     ^               ^       
+ +- offset from sym    |               +- addend (for RELA relocations)
+    start              +- name of referenced symbol; () means it's a function

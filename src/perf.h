@@ -28,7 +28,7 @@
 #ifndef PERF_H_
 #define PERF_H_
 
-void print_memstats();
+void	perf_print_memstats();
 
 #endif
 

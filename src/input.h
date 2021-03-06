@@ -32,89 +32,69 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-struct Elf32 
+#include "symtab.h"
+struct Elf32
 {
-    Elf32_Shdr* sections; // array of all sections
-    uint16_t	shnum;    // number of elements in that array
+	Elf32_Shdr *	sections;	// array of all sections
+	uint16_t	shnum;		// number of elements in that array
 
-    Elf32_Shdr* shstrtab; // string table for section names
+	Elf32_Shdr *	shstrtab;	// string table for section names
 
-    // symtab
-    Elf32_Shdr* symtab;	    // the .symtab section
-    int		symtab_idx; // the section's index
-    Elf32_Shdr* strtab;	    // corresponding string section for symbol names
+	// symtab
+	Elf32_Shdr *	symtab;		// the .symtab section
+	int		symtab_idx;	// the section's index
+	Elf32_Shdr *	strtab;		// corresponding string section for symbol names
 
-    // dynsym
-    Elf32_Shdr* dsymtab;    // the .dynsym section
-    int		dsymtab_idx;// the section's index
-    Elf32_Shdr* dstrtab;    // corresponding string section for symbol names
-} elf32;
-
-struct Elf64 
-{
-    Elf64_Shdr* sections;
-    uint16_t	shnum;
-
-    Elf64_Shdr* shstrtab;
-
-    // symtab
-    Elf64_Shdr* symtab;
-    int		symtab_idx;
-    Elf64_Shdr* strtab;
-
-    // dynsym
-    Elf64_Shdr* dsymtab;
-    int		dsymtab_idx;
-    Elf64_Shdr* dstrtab;
-} elf64;
-
-struct input;
-struct symtab;
-
-struct reader_funcs
-{
-    // Bitness independent functions to read input
-    void (*find_sections)(struct input*);
-    struct symtab* (*read_symtab)(struct input*);
-    void (*process_relocations)(struct input*, struct symtab*);
+	// dynsym
+	Elf32_Shdr *	dsymtab;	// the .dynsym section
+	int		dsymtab_idx;	// the section's index
+	Elf32_Shdr *	dstrtab;	// corresponding string section for symbol names
 };
 
-struct input
+struct Elf64
 {
-    int fd;			// file descriptor of that file
-    unsigned long long fsize;
+	Elf64_Shdr *	sections;
+	uint16_t	shnum;
 
-    char* map;			// mmap'ed input ELF file
+	Elf64_Shdr *	shstrtab;
 
-    bool same_endian;		// input ELF has same endianness as us?
-    bool is_64;			// input ELF is 64-bit?
+	// symtab
+	Elf64_Shdr *	symtab;
+	int		symtab_idx;
+	Elf64_Shdr *	strtab;
 
-    union
-    {
-	struct Elf32 elf32;
-	struct Elf64 elf64;
-    };
+	// dynsym
+	Elf64_Shdr *	dsymtab;
+	int		dsymtab_idx;
+	Elf64_Shdr *	dstrtab;
 };
 
-void init_input(struct input*);
-void open_input(struct input*);
-void fini_input(struct input*);
-struct reader_funcs init_reader_funcs(struct input*);
+typedef	struct input_s	input_t;
 
-uint16_t get_uint16(void* ptr);
-uint32_t get_uint32(void* ptr);
-uint64_t get_uint64(void* ptr);
+input_t *	input_init(void);
+void 		input_open(input_t* in);
+void		input_close(input_t* in);
 
-struct reader_funcs read_elf_header(struct input* in);
-void find_sections_32(struct input* in);
-void process_relocations_32(struct input* in, struct symtab*);
-struct symtab* read_in_symtab_32(struct input* in);
+// Bitness-independent functions to read input
+struct 	reader_funcs
+{
+	void		(*find_sections)(input_t *);
+	symtab_t *	(*read_symtab)(input_t *);
+	void		(*process_relocations)(input_t *, symtab_t *);
+};
+struct reader_funcs	input_read_elf_header(input_t* in);
 
-void find_sections_64(struct input* in);
-void process_relocations_64(struct input* in, struct symtab*);
-struct symtab* read_in_symtab_64(struct input* in);
+// Input file properties and content access functions
+unsigned long long	input_get_file_size(input_t* in);
+char *			input_get_mem_map(input_t* in);
+bool			input_get_is_same_endian(input_t* in);
+struct Elf32 *		input_get_elf32(input_t* in);
+struct Elf64 * 		input_get_elf64(input_t* in);
 
-// Filtering function for symtab
-bool sym_is_interesting(const char* name, int type);
+// Helper reader functions
+uint16_t	get_uint16(void* ptr);
+uint32_t	get_uint32(void* ptr);
+uint64_t	get_uint64(void* ptr);
+
 #endif
 

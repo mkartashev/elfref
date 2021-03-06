@@ -32,7 +32,7 @@ CFLAGS_comm += -Wformat-security -Wduplicated-cond -Wfloat-equal -Wshadow -Wconv
 CFLAGS_comm += -D_GNU_SOURCE
 
 # Mode-specific compiler flags
-CFLAGS_debug := -g -O1
+CFLAGS_debug := -g
 CFLAGS_opt   := -O -flto
 
 # The default mode
@@ -56,7 +56,8 @@ help:
 	@echo "    all     - build optimized version (default)"
 	@echo "    tar     - package source and makefiles"
 	@echo "    clean   - remove object and generated source files"
-	@echo "	   clobber - clean and remove auto-generated dependencies"
+	@echo "    clobber - clean and remove auto-generated dependencies"
+	@echo "    test    - run tests"
 	@echo
 	@echo "Options:"
 	@echo "    MODE=opt   - build optimized version (default)"
@@ -72,6 +73,7 @@ $(BIN): $(OBJ)
 
 clean:
 	$(RM) $(BIN)
+	$(RM) -rf ./RUN\.*
 	$(RM) $(OBJ)
 	$(RM) $(GEN_SRC)
 
@@ -81,6 +83,9 @@ clobber: clean
 tar:
 	@tar czvf elfrefs.tar.gz $(SRC) $(HDR) src/depinput.inc > /dev/null
 	@echo "Source tree packed into elfrefs.tar.gz"
+
+test: $(BIN)
+	-@./runtests.sh
 
 obj/%.o: src/%.c
 	$(CC) -c $(CFLAGS) $< -o $@

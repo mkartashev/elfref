@@ -1,0 +1,20 @@
+elfref: Input (filename) is a 32-bit little endian ELF relocatable file.
+__x86.get_pc_thunk.bx (addr 0x00000000)
+	(+0x0008)-> __x86.get_pc_thunk.ax()
+	(+0x000d)-> _GLOBAL_OFFSET_TABLE_
+	(+0x0013)-> array
+array (addr 0x00000020)
+	(+0x0000)-> 
+	(+0x0002)-> array
+main (addr 0x0000002f)
+	(+0x0009)-> __x86.get_pc_thunk.bx()
+	(+0x000f)-> _GLOBAL_OFFSET_TABLE_
+	(+0x0011)-> 
+	(+0x0017)-> foo()
+	(+0x0020)-> array
+	(+0x002c)-> array
+	(+0x0035)-> 
+	(+0x0035)-> foo()
+	(+0x003b)-> array
+	(+0x0044)-> array
+	(+0x0049)-> 
