@@ -29,16 +29,17 @@
 #ifndef DEPINPUT_H_
 #define DEPINPUT_H_
 
-typedef struct input_s	input_t;
-typedef struct symtab_s	symtab_t;
+typedef struct input_s		input_t;
+typedef struct symtab_s		symtab_t;
+typedef struct elf_sections_s 	elf_sections_t;
 
 // Bitness-dependent versions, implementations are in depintpu[32|64].c, which is produced by pre-processing depinput.inc
-void		find_sections_32(input_t* in);
-void		process_relocations_32(input_t* in, symtab_t*);
-symtab_t*	read_in_symtab_32(input_t* in);
+elf_sections_t *	find_sections_32(input_t* in);
+symtab_t*		read_in_symtab_32(input_t* in, elf_sections_t*);
+void			process_relocations_32(input_t* in, elf_sections_t*, symtab_t*);
 
-void		find_sections_64(input_t* in);
-void		process_relocations_64(input_t* in, symtab_t*);
-symtab_t*	read_in_symtab_64(input_t* in);
+elf_sections_t*		find_sections_64(input_t* in);
+symtab_t*		read_in_symtab_64(input_t* in, elf_sections_t*);
+void			process_relocations_64(input_t* in, elf_sections_t*, symtab_t*);
 
 #endif // DEPINPUT_H_

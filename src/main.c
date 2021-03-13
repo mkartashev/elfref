@@ -32,10 +32,8 @@
 #include "perf.h"
 #include "symtab.h"
 
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <elf.h>
 #include <assert.h>
+#include <stdlib.h>
 
 static void	print_refs(input_t* in)
 {
@@ -43,12 +41,11 @@ static void	print_refs(input_t* in)
 
 	struct reader_funcs rdr = input_read_elf_header(in);
 
-	rdr.find_sections(in);
-
-	symtab_t *st = rdr.read_symtab(in);
+	elf_sections_t * sec = rdr.find_sections(in);
+	symtab_t *st = rdr.read_symtab(in, sec);
 	if (st)
 	{
-		rdr.process_relocations(in, st);
+		rdr.process_relocations(in, sec, st);
 		symtab_dump(st);
 		symtab_free(st);
 	}

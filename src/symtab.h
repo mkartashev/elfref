@@ -29,7 +29,6 @@
 #define SYMTAB_H_
 
 #include <stdbool.h>
-#include <stdlib.h>
 #include <sys/types.h>
 
 typedef struct symtab_s		symtab_t;

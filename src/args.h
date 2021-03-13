@@ -28,9 +28,10 @@
 #ifndef ARGS_H_
 #define ARGS_H_
 
-#include "input.h"
-
 #include <stdbool.h>
+
+typedef struct input_s 	input_t;
+
 
 void 		args_init(void);
 

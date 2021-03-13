@@ -51,12 +51,6 @@ struct	input_s
 
 	bool			same_endian;	// input ELF has same endianness as us?
 	bool			is_64;		// input ELF is 64-bit?
-
-	union
-	{
-		struct Elf32	elf32;		// 32-bit ELF file descriptor
-		struct Elf64	elf64;		// 64-bit ELF file descriptor
-	};
 };
 
 /**
@@ -88,26 +82,6 @@ extern bool			input_get_is_same_endian(input_t* in)
 }
 
 /**
- * Returns pointer to Elf32 (see) that contains ELF-specific information of interest .
- */
-extern struct Elf32 *		input_get_elf32(input_t* in)
-{
-	assert(in);
-	assert(!in->is_64);
-	return &in->elf32;
-}
-
-/**
- * Returns pointer to Elf64 (see) that contains ELF-specific information of interest .
- */
-extern struct Elf64 * 		input_get_elf64(input_t* in)
-{
-	assert(in);
-	assert(in->is_64);
-	return &in->elf64;
-}
-
-/**
  * Returns initialized input.
  */
 extern input_t*	input_init(void)
@@ -121,7 +95,7 @@ extern input_t*	input_init(void)
 }
 
 /**
- * Opens the input for reading. Issues appropriate errors if they occur during opening.
+ * Opens the input for reading. Issues appropriate errors if they occur during opening and does not return in that case.
  */
 extern void	input_open(input_t* in)
 {

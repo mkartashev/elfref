@@ -63,9 +63,9 @@ static const char *usage_str =
  */
 extern void 	args_usage(void)
 {
-    printf(usage_str, glob_get_program_name());
-    printf("\nOutput format:\n");
-    symtab_print_legend();
+	printf(usage_str, glob_get_program_name());
+	printf("\nOutput format:\n");
+	symtab_print_legend();
 }
 
 /**
@@ -82,46 +82,66 @@ extern void 	args_init(void)
  */
 extern bool	args_parse(int argc, char* argv[], input_t* in)
 {
-    assert( in );
+	assert(in);
 
-    for(int i = 1; i < argc; ++i) {
-	const char* arg = argv[i];
+	for (int i = 1; i < argc; ++i)
+	{
+		const char *arg = argv[i];
 
-	if ( strcmp(arg, "-v") == 0 ) {
-	    verbosity = VERB;
-	} else if ( strcmp(arg, "-vv") == 0 ) {
-	    verbosity = DBG;
-	} else if ( strcmp(arg, "-f") == 0 ) {
-	    funcs_only = true;
-	} else if ( strcmp(arg, "-d") == 0 ) {
-	    offsets_decimal = true;
-	} else if ( strcmp(arg, "--help") == 0 || strcmp(arg, "-?") == 0 || strcmp(arg, "-h") == 0 ) {
-	    return false;
-	} else if ( strcmp(arg, "-s") == 0 ) {
-	    i++;
-	    if ( i < argc ) {
-		name_pattern = argv[i];
-	    } else {
-		report(NORM, "-s option requires argument");
-		return false;
-	    }
-	} else {
-	    if ( ! fname ) {
-		fname = arg;
-	    } else {
-		report(NORM, "Only one file name argument is supported (%s will be ignored)", arg);
-	    }
+		if (strcmp(arg, "-v") == 0)
+		{
+			verbosity = VERB;
+		}
+		else if (strcmp(arg, "-vv") == 0)
+		{
+			verbosity = DBG;
+		}
+		else if (strcmp(arg, "-f") == 0)
+		{
+			funcs_only = true;
+		}
+		else if (strcmp(arg, "-d") == 0)
+		{
+			offsets_decimal = true;
+		}
+		else if (strcmp(arg, "--help") == 0 || strcmp(arg, "-?") == 0 || strcmp(arg, "-h") == 0)
+		{
+			return false;
+		}
+		else if (strcmp(arg, "-s") == 0)
+		{
+			i++;
+			if (i < argc)
+			{
+				name_pattern = argv[i];
+			}
+			else
+			{
+				report(NORM, "-s option requires argument");
+				return false;
+			}
+		}
+		else
+		{
+			if (!fname)
+			{
+				fname = arg;
+			}
+			else
+			{
+				report(NORM, "Only one file name argument is supported (%s will be ignored)", arg);
+			}
+		}
 	}
-    }
 
-    if ( !fname ) {
-	report(NORM, "ELF file name required");
-	return false;
-    }
+	if (!fname)
+	{
+		report(NORM, "ELF file name required");
+		return false;
+	}
 
-    return true;
+	return true;
 }
-
 
 /**
  * Returns the input ELF file name.

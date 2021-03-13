@@ -44,7 +44,7 @@ CFLAGS+= $(CFLAGS_comm)
 HDR :=
 SRC := Makefile src/Makefile
 OBJ :=
-GEN_SRC := 
+GEN_SRC :=
 BIN := elfref
 
 .PHONY: clean clobber tar help
